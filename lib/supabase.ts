@@ -62,6 +62,16 @@ const AuthStorage = {
   },
 };
 
+/** Node/SSR (Expo static web export) lacks native WebSocket on Node < 22. */
+function getRealtimeOptions(): { transport?: typeof WebSocket } {
+  if (typeof WebSocket !== 'undefined') {
+    return {};
+  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ws = require('ws') as typeof WebSocket;
+  return { transport: ws };
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: AuthStorage,
@@ -69,4 +79,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
+  realtime: getRealtimeOptions(),
 });
