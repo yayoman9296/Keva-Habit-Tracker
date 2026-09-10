@@ -51,3 +51,54 @@ Built by [Yeshayahu Salzman](https://www.linkedin.com/in/yayosalzman9296). A pra
 ## License
 
 MIT
+
+---
+
+## Setup
+
+1. Copy env vars into a local `.env` (never commit this file):
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=...
+EXPO_PUBLIC_SUPABASE_ANON_KEY=...
+# Optional — production RevenueCat keys (dev/preview use the built-in test key)
+EXPO_PUBLIC_REVENUECAT_IOS_API_KEY=...
+EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY=...
+```
+
+2. Install and typecheck:
+
+```bash
+npm install
+npm run typecheck
+npx expo start
+```
+
+## EAS Build
+
+`eas.json` and `app.json` include EAS project id `51bff123-2ea6-4b8d-86f3-43b8b330a5c7`. Config plugins for notifications, location, and secure store are set for Expo SDK 56.
+
+**One-time (interactive) — required on your machine:**
+
+```bash
+npm install -g eas-cli   # if needed
+npx expo login           # or: eas login
+eas whoami
+```
+
+**First builds:**
+
+```bash
+# Development client (internal)
+npm run eas:build:development -- --platform ios
+npm run eas:build:development -- --platform android
+
+# Internal preview
+npm run eas:build:preview -- --platform all
+
+# Store production (auto-increments version)
+npm run eas:build:production -- --platform all
+```
+
+On the first iOS/Android build, EAS will prompt interactively for Apple/Google credentials unless you already stored them with `eas credentials`. Do not put API keys or store secrets into git.
+

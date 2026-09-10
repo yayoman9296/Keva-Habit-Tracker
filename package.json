@@ -42,7 +42,12 @@
     "start": "WEB_HOST=0.0.0.0 expo start --host lan",
     "web": "WEB_HOST=0.0.0.0 expo start --web --host lan",
     "android": "WEB_HOST=0.0.0.0 expo start --android --host lan",
-    "ios": "WEB_HOST=0.0.0.0 expo start --ios --host lan"
+    "ios": "WEB_HOST=0.0.0.0 expo start --ios --host lan",
+    "typecheck": "tsc --noEmit",
+    "eas:build:development": "eas build --profile development",
+    "eas:build:preview": "eas build --profile preview",
+    "eas:build:production": "eas build --profile production",
+    "eas:submit": "eas submit --profile production"
   },
   "private": true
 }

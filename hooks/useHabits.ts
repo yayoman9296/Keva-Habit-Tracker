@@ -195,7 +195,7 @@ export function useHabits() {
         await fetchHabits();
       }
     },
-    [habits, today, fetchHabits],
+    [habits, today, fetchHabits, isFrozenDay],
   );
 
   const checkInAll = useCallback(async () => {

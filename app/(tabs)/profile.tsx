@@ -37,24 +37,24 @@ function SettingRow({
   right?: React.ReactNode;
 }) {
   const content = (
-    <View style={styles.settingRow}>
+    <>
       <View style={styles.settingText}>
         <Text style={styles.settingLabel}>{label}</Text>
         {hint ? <Text style={styles.settingHint}>{hint}</Text> : null}
       </View>
       {right ?? (value ? <Text style={styles.settingValue}>{value}</Text> : null)}
-    </View>
+    </>
   );
 
   if (onPress) {
     return (
-      <Pressable onPress={onPress} style={styles.settingPressable}>
+      <Pressable onPress={onPress} style={styles.settingRow}>
         {content}
       </Pressable>
     );
   }
 
-  return content;
+  return <View style={styles.settingRow}>{content}</View>;
 }
 
 function StatItem({ value, label }: { value: number; label: string }) {
@@ -280,10 +280,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.label,
     fontSize: 11,
     marginTop: 4,
-  },
-  settingPressable: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
   },
   settingRow: {
     alignItems: 'center',

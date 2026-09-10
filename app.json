@@ -45,6 +45,20 @@
           "resizeMode": "contain",
           "backgroundColor": "#080810"
         }
+      ],
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Keva uses your location to calculate accurate Shabbat candle-lighting and nightfall times."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#F7A26A",
+          "defaultChannel": "reminders"
+        }
       ]
     ],
     "experiments": {

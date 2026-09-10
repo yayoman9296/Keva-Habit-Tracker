@@ -102,7 +102,11 @@ async function fetchAndCacheCoords(): Promise<Coords | null> {
 
 export async function getUserCoords(): Promise<Coords | null> {
   const cached = await loadCachedCoords();
-  if (cached) return cached;
+  if (cached) {
+    // Refresh in the background so Shabbat times stay accurate if the user moves.
+    void fetchAndCacheCoords().catch(() => {});
+    return cached;
+  }
   return fetchAndCacheCoords();
 }
 

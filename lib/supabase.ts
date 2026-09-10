@@ -10,6 +10,12 @@ if (Platform.OS !== 'web') {
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn(
+    '[Keva] Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY. Auth and data will fail until .env is configured.',
+  );
+}
+
 function canUseStorage(): boolean {
   // Expo static web rendering runs in Node.js where window is undefined.
   if (Platform.OS === 'web' && typeof window === 'undefined') {

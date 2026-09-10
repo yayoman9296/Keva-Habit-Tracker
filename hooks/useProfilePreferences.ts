@@ -2,6 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
+type ShabbatModeListener = (enabled: boolean) => void;
+const listeners = new Set<ShabbatModeListener>();
+
+/** Notify all mounted preference hooks when Shabbat mode changes mid-session. */
+export function notifyShabbatModeChanged(enabled: boolean): void {
+  listeners.forEach((listener) => listener(enabled));
+}
+
 export function useProfilePreferences() {
   const [shabbatMode, setShabbatMode] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -36,5 +44,15 @@ export function useProfilePreferences() {
     fetchPreferences();
   }, [fetchPreferences]);
 
-  return { shabbatMode, loading };
+  useEffect(() => {
+    const listener: ShabbatModeListener = (enabled) => {
+      setShabbatMode(enabled);
+    };
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
+  return { shabbatMode, loading, refresh: fetchPreferences };
 }

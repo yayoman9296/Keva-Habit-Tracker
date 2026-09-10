@@ -63,7 +63,15 @@ export default function SignupScreen() {
     }
 
     setLoading(false);
-    router.replace('/(tabs)');
+
+    // Supabase may require email confirmation — only enter the app when a session exists.
+    if (data.session) {
+      router.replace('/(tabs)');
+      return;
+    }
+
+    setError('Check your email to confirm your account, then sign in.');
+    hapticNotify(HapticNotify.Success);
   }
 
   return (

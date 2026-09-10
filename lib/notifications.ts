@@ -24,9 +24,23 @@ const REMINDER_MESSAGES = [
 
 const SCHEDULE_HORIZON_DAYS = 30;
 const NOTIFICATION_TITLE = 'Keva';
+const ANDROID_CHANNEL_ID = 'reminders';
+
+export type ScheduleNotificationOptions = {
+  /** When true (default), skip fire times that fall in the Shabbat window. */
+  respectShabbat?: boolean;
+};
 
 export async function requestNotificationPermission(): Promise<boolean> {
   if (Platform.OS === 'web') return false;
+
+  // Android 13+ only prompts after at least one channel exists.
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
+      name: 'Daily reminders',
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
 
   const { status: existing } = await Notifications.getPermissionsAsync();
   if (existing === 'granted') return true;
@@ -55,8 +69,13 @@ function pickMessage(fireDate: Date): string {
   return REMINDER_MESSAGES[((epochDay % REMINDER_MESSAGES.length) + REMINDER_MESSAGES.length) % REMINDER_MESSAGES.length];
 }
 
-export async function scheduleNotification(time: string): Promise<void> {
+export async function scheduleNotification(
+  time: string,
+  options: ScheduleNotificationOptions = {},
+): Promise<void> {
   if (Platform.OS === 'web') return;
+
+  const respectShabbat = options.respectShabbat ?? true;
 
   const granted = await requestNotificationPermission();
   if (!granted) return;
@@ -67,7 +86,7 @@ export async function scheduleNotification(time: string): Promise<void> {
   if (!parsed) return;
 
   // If location permission is denied, coords is null — schedule every day without Shabbat filtering.
-  const coords = await getUserCoords();
+  const coords = respectShabbat ? await getUserCoords() : null;
   const now = new Date();
 
   for (let i = 0; i < SCHEDULE_HORIZON_DAYS; i++) {
@@ -76,13 +95,14 @@ export async function scheduleNotification(time: string): Promise<void> {
     fire.setHours(parsed.hour, parsed.minute, 0, 0);
 
     if (fire <= now) continue;
-    if (coords && isShabbatAt(coords, fire)) continue;
+    if (respectShabbat && coords && isShabbatAt(coords, fire)) continue;
 
     await Notifications.scheduleNotificationAsync({
       content: { title: NOTIFICATION_TITLE, body: pickMessage(fire) },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: fire,
+        ...(Platform.OS === 'android' ? { channelId: ANDROID_CHANNEL_ID } : {}),
       },
     });
   }
@@ -90,7 +110,10 @@ export async function scheduleNotification(time: string): Promise<void> {
 
 export type UseNotificationsResult = {
   permissionGranted: boolean;
-  scheduleNotification: (time: string) => Promise<void>;
+  scheduleNotification: (
+    time: string,
+    options?: ScheduleNotificationOptions,
+  ) => Promise<void>;
   cancelAll: () => Promise<void>;
 };
 
@@ -111,9 +134,12 @@ export function useNotifications(): UseNotificationsResult {
     };
   }, []);
 
-  const schedule = useCallback(async (time: string) => {
-    await scheduleNotification(time);
-  }, []);
+  const schedule = useCallback(
+    async (time: string, options?: ScheduleNotificationOptions) => {
+      await scheduleNotification(time, options);
+    },
+    [],
+  );
 
   const cancel = useCallback(async () => {
     await cancelAll();
