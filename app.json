@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Keva",
+    "slug": "keva",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "keva",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "backgroundColor": "#080810",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#080810"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yayoman.keva"
+    },
+    "android": {
+      "package": "com.yayoman.keva",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#080810"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png",
+      "backgroundColor": "#080810"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#080810"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "51bff123-2ea6-4b8d-86f3-43b8b330a5c7"
+      }
+    }
+  }
+}
