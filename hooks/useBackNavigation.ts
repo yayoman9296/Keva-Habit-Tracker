@@ -1,16 +1,15 @@
-import { useRouter, usePathname, useSegments } from 'expo-router';
+import { useRouter, useSegments } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 
 function isMainTab(segments: string[]): boolean {
   if (segments[0] !== '(tabs)') return false;
 
   const tab = segments[1];
-  return !tab || tab === 'index' || tab === 'stats' || tab === 'profile';
+  return !tab || tab === 'index' || tab === 'stats' || tab === 'social' || tab === 'profile';
 }
 
 export function useBackNavigation() {
   const router = useRouter();
-  const pathname = usePathname();
   const segments = useSegments();
 
   const isMainTabScreen = useMemo(() => isMainTab(segments), [segments]);

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import type { User } from '@supabase/supabase-js';
 
+import { notifyShabbatModeChanged } from '@/hooks/useProfilePreferences';
 import { useSubscription } from '@/hooks/useSubscription';
 import { scheduleNotification } from '@/lib/notifications';
 import { DEFAULT_NOTIFICATION_TIME } from '@/lib/time';
@@ -134,8 +135,9 @@ export function useProfile() {
         .single();
 
       if (updateError) throw updateError;
-      setProfile(data as ProfileRow);
-      await scheduleNotification(time);
+      const updated = data as ProfileRow;
+      setProfile(updated);
+      await scheduleNotification(time, { respectShabbat: updated.shabbat_mode });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update notification time');
     } finally {
@@ -147,6 +149,7 @@ export function useProfile() {
     if (!user) return;
 
     setProfile((prev) => (prev ? { ...prev, shabbat_mode: enabled } : prev));
+    notifyShabbatModeChanged(enabled);
 
     try {
       const { error: updateError } = await supabase
@@ -155,11 +158,14 @@ export function useProfile() {
         .eq('id', user.id);
 
       if (updateError) throw updateError;
+
+      const notificationTime = profile?.notification_time ?? DEFAULT_NOTIFICATION_TIME;
+      await scheduleNotification(notificationTime, { respectShabbat: enabled });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update Shabbat mode');
       await fetchProfile();
     }
-  }, [user, fetchProfile]);
+  }, [user, fetchProfile, profile?.notification_time]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
